@@ -1,0 +1,24 @@
+{
+  "name": "pubg-uc-topup",
+  "version": "1.0.0",
+  "description": "UC top-up store: responsive storefront, accounts, wallet and orders",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "node --test test/auth.test.js test/shop.test.js"
+  },
+  "dependencies": {
+    "@electric-sql/pglite": "^0.5.16",
+    "bcryptjs": "^3.0.3",
+    "cookie-parser": "^1.4.7",
+    "express": "^5.3.0",
+    "express-rate-limit": "^8.7.4",
+    "jsonwebtoken": "^9.0.3",
+    "pg": "^8.23.1"
+  },
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  }
+}

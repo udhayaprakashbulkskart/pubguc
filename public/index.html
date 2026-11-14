@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="UC top-ups, suits and car skins. Add items to your cart, pay from your wallet and track every order.">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0b0f17">
+  <title>UC Topup</title>
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/pro.css">
+  <script src="/js/theme-boot.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#app">Skip to content</a>
+
+  <header class="site-header">
+    <div class="container nav">
+      <a href="#/" class="brand" id="brand">UC Topup</a>
+
+      <nav class="nav-links" id="nav-links" aria-label="Main">
+        <a href="#/">Shop</a>
+        <a href="#/orders" data-auth>Orders</a>
+        <a href="#/profile" data-auth>Account</a>
+        <span class="balance-pill" id="nav-balance" data-auth></span>
+        <a href="#/login" class="btn btn-ghost" data-guest>Log in</a>
+        <a href="#/signup" class="btn btn-primary" data-guest>Sign up</a>
+        <button type="button" class="btn btn-ghost" id="logout-btn" data-auth>Log out</button>
+      </nav>
+
+      <div class="nav-right">
+        <button type="button" class="icon-btn" id="theme-btn" aria-label="Switch theme"></button>
+        <button type="button" class="icon-btn cart-btn" id="cart-btn" aria-label="Open cart">
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M3 4h2l2.4 10.2a2 2 0 0 0 2 1.8h7.9a2 2 0 0 0 2-1.6L21 8H6.2" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="10" cy="20" r="1.5" fill="currentColor"/><circle cx="17" cy="20" r="1.5" fill="currentColor"/></svg>
+          <span class="cart-count" id="cart-count" hidden>0</span>
+        </button>
+        <button class="nav-toggle" type="button" aria-label="Toggle menu" aria-expanded="false" aria-controls="nav-links" data-nav-toggle>
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="app" class="container main" tabindex="-1">
+    <div class="skeleton-page" aria-label="Loading">
+      <div class="skeleton skeleton-title"></div>
+      <div class="skeleton skeleton-line"></div>
+    </div>
+  </main>
+
+  <button type="button" class="cart-bar" id="cart-bar" data-open-cart hidden>
+    <span data-bar-text>0 items</span>
+    <span class="cart-bar-cta">View cart →</span>
+  </button>
+
+  <aside class="drawer" id="cart-drawer" hidden aria-label="Shopping cart"></aside>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>&copy; <span id="year"></span> <span class="footer-brand">UC Topup</span>. All rights reserved.</p>
+      <p class="small">This store is independent and is not affiliated with, endorsed by or sponsored by KRAFTON, Inc. or PUBG. Only buy for Player IDs you own.</p>
+    </div>
+  </footer>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="/js/core.js"></script>
+  <script src="/js/shop.js"></script>
+  <script src="/js/account.js"></script>
+  <script src="/js/router.js"></script>
+</body>
+</html>
