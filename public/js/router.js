@@ -85,7 +85,12 @@
     $('#year').textContent = new Date().getFullYear();
 
     state.config = await api('/config');
-    state.fmt = new Intl.NumberFormat(undefined, { style: 'currency', currency: state.config.currency });
+    state.fmt = new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: state.config.currency,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    });
     $('#brand').textContent = state.config.brand;
     $('.footer-brand').textContent = state.config.brand;
     document.title = state.config.brand;

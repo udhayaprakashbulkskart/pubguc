@@ -26,8 +26,9 @@ async function newBuyer(tag, { balance = 0, pubgId = '5000011122' } = {}) {
     password: 'buyer-password-1',
     pubg_id: pubgId,
   });
-  if (balance > 0) await call('POST', '/api/wallet/topup', { amount_cents: balance });
-  return { call, user: data.user };
+  const user = data.user;
+  if (balance > 0) await query('UPDATE users SET balance_cents = $1 WHERE id = $2', [balance, user.id]);
+  return { call, user };
 }
 
 const balanceOf = async (userId) => (await one('SELECT balance_cents FROM users WHERE id = $1', [userId])).balance_cents;
@@ -81,7 +82,7 @@ test('catalog sorting orders prices correctly', async () => {
 test('wallet top-up validates the amount and credits the balance', async () => {
   const { call } = await newBuyer('wallet');
   assert.equal((await call('POST', '/api/wallet/topup', { amount_cents: 50 })).status, 400);
-  assert.equal((await call('POST', '/api/wallet/topup', { amount_cents: 999999 })).status, 400);
+  assert.equal((await call('POST', '/api/wallet/topup', { amount_cents: 20000000 })).status, 400);
 
   const top = await call('POST', '/api/wallet/topup', { amount_cents: 2500 });
   assert.equal(top.status, 200);
@@ -94,7 +95,7 @@ test('wallet top-up validates the amount and credits the balance', async () => {
 // ---------- Checkout validation ----------
 
 test('checkout rejects empty carts, bad lines and oversized orders', async () => {
-  const { call } = await newBuyer('validation', { balance: 100000 });
+  const { call } = await newBuyer('validation', { balance: 100000000 });
   const uc = await product('660 UC');
 
   assert.equal((await call('POST', '/api/checkout', { items: [] })).status, 400);
@@ -127,7 +128,7 @@ test('checkout refuses when the wallet is short and creates nothing', async () =
 });
 
 test('inactive products cannot be bought', async () => {
-  const { call } = await newBuyer('inactive', { balance: 100000 });
+  const { call } = await newBuyer('inactive', { balance: 100000000 });
   const p = await product('Rust Runner Skin');
   await query('UPDATE products SET active = false WHERE id = $1', [p.id]);
   try {
@@ -141,7 +142,7 @@ test('inactive products cannot be bought', async () => {
 });
 
 test('cosmetics can only be bought once per order', async () => {
-  const { call } = await newBuyer('once', { balance: 100000 });
+  const { call } = await newBuyer('once', { balance: 100000000 });
   const suit = await product('Frostline Suit');
   const res = await call('POST', '/api/checkout', { items: [{ product_id: suit.id, quantity: 2 }] });
   assert.equal(res.status, 400);
@@ -151,7 +152,7 @@ test('cosmetics can only be bought once per order', async () => {
 // ---------- Checkout success and pricing ----------
 
 test('multi-item checkout charges server prices and delivers every line', async () => {
-  const { call, user } = await newBuyer('multi', { balance: 50000 });
+  const { call, user } = await newBuyer('multi', { balance: 100000000 });
   const uc = await product('660 UC');
   const suit = await product('Desert Ranger Suit');
   const skin = await product('Neon Drift Skin');
@@ -172,8 +173,8 @@ test('multi-item checkout charges server prices and delivers every line', async 
   assert.equal(res.data.order.total_cents, expected);
   assert.equal(res.data.order.items.length, 3);
   assert.ok(res.data.order.items.every((i) => i.status === 'delivered' && i.delivery_ref));
-  assert.equal(res.data.balance_cents, 50000 - expected);
-  assert.equal(await balanceOf(user.id), 50000 - expected);
+  assert.equal(res.data.balance_cents, 100000000 - expected);
+  assert.equal(await balanceOf(user.id), 100000000 - expected);
 
   const txn = await one(
     "SELECT amount_cents FROM wallet_txns WHERE user_id = $1 AND type = 'purchase' ORDER BY id DESC LIMIT 1",
@@ -183,14 +184,14 @@ test('multi-item checkout charges server prices and delivers every line', async 
 });
 
 test('checkout uses the saved Player ID when none is sent', async () => {
-  const { call } = await newBuyer('saved', { balance: 5000, pubgId: '7000011122' });
+  const { call } = await newBuyer('saved', { balance: 100000000, pubgId: '7000011122' });
   const res = await call('POST', '/api/checkout', { items: [{ product_id: (await product('60 UC')).id }] });
   assert.equal(res.status, 201);
   assert.equal(res.data.order.pubg_id, '7000011122');
 });
 
 test('a repeated checkout with the same client_ref is charged only once', async () => {
-  const { call, user } = await newBuyer('idem', { balance: 50000 });
+  const { call, user } = await newBuyer('idem', { balance: 100000000 });
   const pkg = await product('325 UC');
   const body = { items: [{ product_id: pkg.id }], client_ref: 'idem-key-0001' };
 
@@ -201,11 +202,11 @@ test('a repeated checkout with the same client_ref is charged only once', async 
   assert.equal(second.status, 200);
   assert.equal(second.data.duplicate, true);
   assert.equal(second.data.order.id, first.data.order.id);
-  assert.equal(await balanceOf(user.id), 50000 - pkg.price_cents);
+  assert.equal(await balanceOf(user.id), 100000000 - pkg.price_cents);
 });
 
 test('concurrent identical checkouts create one order and one charge', async () => {
-  const { call, user } = await newBuyer('race', { balance: 50000 });
+  const { call, user } = await newBuyer('race', { balance: 100000000 });
   const pkg = await product('60 UC');
   const body = { items: [{ product_id: pkg.id }], client_ref: 'race-key-0001' };
 
@@ -213,14 +214,14 @@ test('concurrent identical checkouts create one order and one charge', async () 
 
   const ids = new Set(results.filter((r) => r.status < 300).map((r) => r.data.order.id));
   assert.equal(ids.size, 1, 'every successful response refers to the same order');
-  assert.equal(await balanceOf(user.id), 50000 - pkg.price_cents, 'only one charge');
+  assert.equal(await balanceOf(user.id), 100000000 - pkg.price_cents, 'only one charge');
   const orders = await one('SELECT COUNT(*)::int AS n FROM orders WHERE user_id = $1', [user.id]);
   assert.equal(orders.n, 1);
 });
 
 test('concurrent purchases cannot overdraw the wallet', async () => {
-  const { call, user } = await newBuyer('overdraw', { balance: 1000 });
-  const pkg = await product('660 UC'); // 999 cents, so only one can ever succeed
+  const { call, user } = await newBuyer('overdraw', { balance: 3000000 });
+  const pkg = await product('660 UC'); // Rs 25,000 each against Rs 30,000 funds: only one can succeed
 
   const results = await Promise.all([
     call('POST', '/api/checkout', { items: [{ product_id: pkg.id }], client_ref: 'overdraw-a-01' }),
@@ -229,13 +230,13 @@ test('concurrent purchases cannot overdraw the wallet', async () => {
 
   assert.equal(results.filter((r) => r.status === 201).length, 1);
   assert.equal(results.filter((r) => r.status === 402).length, 1);
-  assert.equal(await balanceOf(user.id), 1000 - pkg.price_cents);
+  assert.equal(await balanceOf(user.id), 3000000 - pkg.price_cents);
 });
 
 // ---------- Failures and refunds ----------
 
 test('when every line fails, the whole order is refunded', async () => {
-  const { call, user } = await newBuyer('allfail', { balance: 50000 });
+  const { call, user } = await newBuyer('allfail', { balance: 100000000 });
   process.env.DELIVERY_MODE = 'fail';
   try {
     const res = await call('POST', '/api/checkout', {
@@ -244,15 +245,15 @@ test('when every line fails, the whole order is refunded', async () => {
     assert.equal(res.status, 201);
     assert.equal(res.data.order.status, 'refunded');
     assert.ok(res.data.order.items.every((i) => i.status === 'refunded'));
-    assert.equal(res.data.balance_cents, 50000, 'wallet is fully restored');
-    assert.equal(await balanceOf(user.id), 50000);
+    assert.equal(res.data.balance_cents, 100000000, 'wallet is fully restored');
+    assert.equal(await balanceOf(user.id), 100000000);
   } finally {
     process.env.DELIVERY_MODE = 'simulate';
   }
 });
 
 test('when only cosmetics fail, UC is kept and only the cosmetic lines are refunded', async () => {
-  const { call, user } = await newBuyer('partial', { balance: 50000 });
+  const { call, user } = await newBuyer('partial', { balance: 100000000 });
   const uc = await product('325 UC');
   const suit = await product('Obsidian Elite Suit');
   const skin = await product('Chrome Storm Skin');
@@ -272,8 +273,8 @@ test('when only cosmetics fail, UC is kept and only the cosmetic lines are refun
 
     const kept = uc.price_cents * 2;
     const refunded = suit.price_cents + skin.price_cents;
-    assert.equal(res.data.balance_cents, 50000 - kept);
-    assert.equal(await balanceOf(user.id), 50000 - kept);
+    assert.equal(res.data.balance_cents, 100000000 - kept);
+    assert.equal(await balanceOf(user.id), 100000000 - kept);
 
     const refundTxn = await one(
       "SELECT amount_cents FROM wallet_txns WHERE user_id = $1 AND type = 'refund' ORDER BY id DESC LIMIT 1",
@@ -288,7 +289,7 @@ test('when only cosmetics fail, UC is kept and only the cosmetic lines are refun
 // ---------- Orders ----------
 
 test('order history and details are private to their owner', async () => {
-  const owner = await newBuyer('owner', { balance: 50000 });
+  const owner = await newBuyer('owner', { balance: 100000000 });
   const stranger = await newBuyer('stranger');
 
   const placed = await owner.call('POST', '/api/checkout', { items: [{ product_id: (await product('60 UC')).id }] });

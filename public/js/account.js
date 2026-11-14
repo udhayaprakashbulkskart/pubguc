@@ -129,7 +129,7 @@
             demo
               ? `<p class="muted small">Demo mode: top-ups are credited instantly for testing. Connect a payment provider before going live.</p>
                  <div class="chip-row">
-                   ${[5, 10, 25, 50].map((n) => `<button class="btn btn-ghost" type="button" data-topup="${n * 100}">+ ${esc(money(n * 100))}</button>`).join('')}
+                   ${[10000, 25000, 50000, 100000].map((n) => `<button class="btn btn-ghost" type="button" data-topup="${n * 100}">+ ${esc(money(n * 100))}</button>`).join('')}
                  </div>`
               : '<p class="muted small">Online top-ups are not set up yet.</p>'
           }

@@ -7,8 +7,8 @@ const { requireAuth, getUserById } = require('../lib/auth');
 const { PAYMENT_MODE } = require('../lib/config');
 
 const router = express.Router();
-const MIN_TOPUP = 100; // 1.00 in major units
-const MAX_TOPUP = 50000; // 500.00 in major units
+const MIN_TOPUP = 100; // Rs 1.00 in paise
+const MAX_TOPUP = 10000000; // Rs 1,00,000.00 in paise
 
 router.get(
   '/wallet',
@@ -31,7 +31,7 @@ router.post(
 
     const amount = Number(req.body.amount_cents);
     if (!Number.isInteger(amount) || amount < MIN_TOPUP || amount > MAX_TOPUP) {
-      throw new HttpError(400, 'Top-up must be between 1.00 and 500.00.');
+      throw new HttpError(400, 'Top-up must be between Rs 1 and Rs 1,00,000.');
     }
 
     await tx(async (t) => {

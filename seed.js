@@ -3,7 +3,7 @@
 /*
  * Sample catalog, inserted only when the products table is empty.
  * Names are generic placeholders. Replace them with items you are authorized to sell.
- * Prices are in cents.
+ * Prices are in paise (1 rupee = 100). Sample prices lie between Rs 10,000 and Rs 1,00,000.
  */
 
 const CATEGORIES = [
@@ -32,22 +32,22 @@ const CATEGORIES = [
 
 // [category, name, description, rarity, price_cents, uc_amount, popular]
 const PRODUCTS = [
-  ['uc', '60 UC', 'Starter pack.', 'common', 99, 60, 0],
-  ['uc', '325 UC', 'Small pack.', 'common', 499, 325, 0],
-  ['uc', '660 UC', 'Best value for regular players.', 'rare', 999, 660, 1],
-  ['uc', '1,800 UC', 'Medium pack.', 'epic', 2499, 1800, 0],
-  ['uc', '3,850 UC', 'Large pack.', 'epic', 4999, 3850, 0],
-  ['uc', '8,100 UC', 'Biggest pack.', 'legendary', 9999, 8100, 0],
+  ['uc', '60 UC', 'Starter pack.', 'common', 1000000, 60, 0],
+  ['uc', '325 UC', 'Small pack.', 'common', 1500000, 325, 0],
+  ['uc', '660 UC', 'Best value for regular players.', 'rare', 2500000, 660, 1],
+  ['uc', '1,800 UC', 'Medium pack.', 'epic', 4000000, 1800, 0],
+  ['uc', '3,850 UC', 'Large pack.', 'epic', 6500000, 3850, 0],
+  ['uc', '8,100 UC', 'Biggest pack.', 'legendary', 10000000, 8100, 0],
 
-  ['suits', 'Jungle Camo Suit', 'Woodland pattern, everyday wear.', 'common', 399, null, 0],
-  ['suits', 'Desert Ranger Suit', 'Sand-toned utility outfit.', 'rare', 599, null, 0],
-  ['suits', 'Frostline Suit', 'Insulated arctic styling.', 'epic', 799, null, 1],
-  ['suits', 'Obsidian Elite Suit', 'Dark tactical full set.', 'legendary', 1299, null, 0],
+  ['suits', 'Jungle Camo Suit', 'Woodland pattern, everyday wear.', 'common', 1000000, null, 0],
+  ['suits', 'Desert Ranger Suit', 'Sand-toned utility outfit.', 'rare', 2500000, null, 0],
+  ['suits', 'Frostline Suit', 'Insulated arctic styling.', 'epic', 5000000, null, 1],
+  ['suits', 'Obsidian Elite Suit', 'Dark tactical full set.', 'legendary', 10000000, null, 0],
 
-  ['car-skins', 'Rust Runner Skin', 'Weathered paint finish.', 'common', 199, null, 0],
-  ['car-skins', 'Neon Drift Skin', 'Glowing accent livery.', 'rare', 349, null, 0],
-  ['car-skins', 'Chrome Storm Skin', 'Mirror-polished metallic finish.', 'epic', 599, null, 1],
-  ['car-skins', 'Gilded Phantom Skin', 'Gold-plated premium finish.', 'legendary', 999, null, 0],
+  ['car-skins', 'Rust Runner Skin', 'Weathered paint finish.', 'common', 1000000, null, 0],
+  ['car-skins', 'Neon Drift Skin', 'Glowing accent livery.', 'rare', 2000000, null, 0],
+  ['car-skins', 'Chrome Storm Skin', 'Mirror-polished metallic finish.', 'epic', 4000000, null, 1],
+  ['car-skins', 'Gilded Phantom Skin', 'Gold-plated premium finish.', 'legendary', 8000000, null, 0],
 ];
 
 /**
